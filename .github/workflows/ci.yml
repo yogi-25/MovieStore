@@ -39,7 +39,19 @@ jobs:
       - name: Push Docker image
         run: docker push yogi109/movie-store:latest
 
-      - name: Start application (for testing purposes)
-        run: npm run start:prod
-        env:
-          NODE_ENV: production
+      - name: Start application in the background
+        run: docker run -d --name movie-store -p 3000:3000 yogi109/movie-store:latest
+
+      - name: Verify container is running
+        run: docker ps -a
+
+      - name: Wait for 30 seconds
+        run: sleep 30
+
+      - name: Stop and remove the application container
+        run: |
+          docker stop movie-store
+          docker rm movie-store
+
+      - name: Verify container is stopped and removed
+        run: docker ps -a
