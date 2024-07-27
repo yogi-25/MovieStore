@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name:test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-movie
+  namespace: staging
+  labels:
+    app: test-movie
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: test-movie
+  template:
+    metadata:
+      labels:
+        app: test-movie
+    spec:
+      containers:
+      - name: test-movie
+        image: 992382663303.dkr.ecr.us-east-1.amazonaws.com/movieapp:latest
+        ports:
+        - name: http
+          containerPort: 3000
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 100m
+          limits:
+            memory: 128Mi
+            cpu: 300m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: express
+  namespace: staging
+spec:
+  selector:
+    app: test-movie
+  ports:
+  - protocol: TCP
+    port: 3000

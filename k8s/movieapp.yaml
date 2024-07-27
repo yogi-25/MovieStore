@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movieapp
+  namespace: staging
+  labels:
+    app: movieapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: movieapp
+  template:
+    metadata:
+      labels:
+        app: movieapp
+    spec:
+      containers:
+      - name: movieapp
+        image: 992382663303.dkr.ecr.us-east-1.amazonaws.com/movieapp:latest
+        ports:
+        - name: http
+          containerPort: 8080
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 300m
+          limits:
+            memory: 128Mi
+            cpu: 300m
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movieapp
+  namespace: staging
+spec:
+  selector:
+    app: movieapp
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
